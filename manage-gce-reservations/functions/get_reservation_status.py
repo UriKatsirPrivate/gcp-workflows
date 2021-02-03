@@ -30,10 +30,10 @@ def get_reservation_status(request):
     zone = 'us-east1-c'
     # reservation_name = request_json['name']
     reservation_name = 'gce2'
+    reservation_name = request_json['body']['name']
 
     reservation = gce_service.reservations().get(
-        project=project, zone=zone,reservation=reservation_name).execute()
-    
+        project=project, zone=zone, reservation=reservation_name).execute()
 
     return reservation
 

@@ -28,12 +28,13 @@ def create_reservation(request):
     project = 'uri-test'
     # zone = request_json['zone']
     zone = 'us-east1-c'
-    body = {"description":"Demo1","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}},"name":"gce"}
+    body = {"description": "Demo1", "specificReservation": {"count": 1,"instanceProperties": {"machineType": "n1-standard-2"}}, "name": "gce"}
+    # body = request_json['body']
 
     try:
         reservation = gce_service.reservations().insert(
-            project=project, zone=zone,body=body).execute()
-    except Exception as e:    
+            project=project, zone=zone, body=body).execute()
+    except Exception as e:
         print(e)
     else:
         return reservation
