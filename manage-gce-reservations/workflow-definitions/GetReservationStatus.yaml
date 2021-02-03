@@ -1,11 +1,11 @@
-# Sample input {"project":"uri-test","zone":"us-central1-a","timeInterval":"10","body":{"description":"Demo","name":"gce","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}}}}
+# Sample input {"project":"uri-test","pubSubTopic":"workflows-demo","zone":"us-central1-a","timeInterval":"10","body":{"description":"Demo","name":"gce","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}}}}
 main:
     params: [args]
     steps:
     - initVariables:
         assign:
         - project: ${args.project}
-        - topic: "workflows-demo"
+        - topic: ${args.pubSubTopic}
         - timeInterval: ${args.timeInterval}
     - Get Reservation Status:
         call: http.post
@@ -22,8 +22,8 @@ main:
         switch:
             - condition: ${ResultCreate.body.status=="READY"}
               next: Publish To PubSub
-        next: Wait 5 Seconds      
-    - Wait 5 Seconds:
+        next: Wait for Reservation Result      
+    - Wait for Reservation Result:
         call: sys.sleep
         args:
             seconds: ${int(args.timeInterval)}
