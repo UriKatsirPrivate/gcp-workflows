@@ -1,0 +1,15 @@
+{
+    "id": "1346377490632244214",
+    "insertTime": "2021-02-03T07:45:29.582-08:00",
+    "kind": "compute#operation",
+    "name": "operation-1612367129106-5ba7079fa5886-0d76d631-c6622d07",
+    "operationType": "insert",
+    "progress": 0,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/uri-test/zones/us-east1-c/operations/operation-1612367129106-5ba7079fa5886-0d76d631-c6622d07",
+    "startTime": "2021-02-03T07:45:29.592-08:00",
+    "status": "RUNNING",
+    "targetId": "8907700465013586934",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/uri-test/zones/us-east1-c/reservations/gce",
+    "user": "workflows-sa@uri-test.iam.gserviceaccount.com",
+    "zone": "https://www.googleapis.com/compute/v1/projects/uri-test/zones/us-east1-c"
+}

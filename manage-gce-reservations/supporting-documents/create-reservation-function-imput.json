@@ -1,0 +1,14 @@
+{
+  "body": {
+    "description": "Demo",
+    "specificReservation": {
+      "count": 1,
+      "instanceProperties": {
+        "machineType": "n1-standard-2"
+      }
+    },
+    "name": "gce"
+  },
+  "project": "uri-test",
+  "zone": "us-east1-c"
+}
