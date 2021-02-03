@@ -1,4 +1,4 @@
-# Sample input {"body":{"description":"Demo","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}},"name":"gce"},"project":"uri-test","zone":"us-central1-a"}
+# Sample input {"project":"uri-test","zone":"us-central1-a","timeInterval":"10","body":{"description":"Demo","name":"gce","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}}}}
 main:
     params: [args]
     steps:
@@ -6,7 +6,7 @@ main:
         assign:
         - project: ${args.project}
         - topic: "workflows-demo"
-        # - message: "GetReservationStatus message"
+        - timeInterval: ${args.timeInterval}
     - Get Reservation Status:
         call: http.post
         args:
@@ -26,7 +26,7 @@ main:
     - Wait 5 Seconds:
         call: sys.sleep
         args:
-            seconds: 5
+            seconds: ${int(args.timeInterval)}
         next: Publish 5 seconds To PubSub    
     - Publish 5 seconds To PubSub:
         call: googleapis.pubsub.v1.projects.topics.publish
@@ -35,7 +35,7 @@ main:
             body:
                 messages:
                     # - data: ${base64.encode(text.encode(message))}
-                    - data: ${base64.encode(text.encode("Waiting 5 seconds message"))}
+                    - data: ${base64.encode(text.encode("Waiting" + timeInterval + " seconds message"))}
         result: publishResult
         next: Get Reservation Status    
     - Publish To PubSub:
