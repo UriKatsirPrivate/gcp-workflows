@@ -1,0 +1,33 @@
+# Sample input {"project":"uri-test","zone":"us-central1-a","timeInterval":"10","body":{"description":"Demo","name":"gce","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}}}}
+main:
+    params: [args]
+    steps:
+    - Delete Reservation:
+        call: http.post
+        args:
+            url: https://us-central1-uri-test.cloudfunctions.net/DeleteGceReservation
+            auth:
+                type: OIDC
+            body:
+                project: ${args.project}
+                zone: ${args.zone}
+                body: ${args.body}
+        result: ResultDelete
+    # - Create Machine Image:
+    #     try:
+    #         call: http.post
+    #         args:
+    #             url: https://us-central1-uri-test.cloudfunctions.net/CreateMachineImages
+    #             auth:
+    #                 type: OIDC
+    #             body:
+    #                 project: ${args.project}
+    #                 items: ${ResultList.body.items}
+    #         result: ResultImages
+    #     except:
+    #         as: e
+    #         steps:
+    #             - All Errors:
+    #                 next: returnValue   
+    - returnValue:
+        return: ${ResultDelete}
