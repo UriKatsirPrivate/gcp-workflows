@@ -1,0 +1,41 @@
+# Sample input {"body":{"description":"Demo","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}},"name":"gce"},"project":"uri-test","zone":"us-east1-c"}
+main:
+    params: [args]
+    steps:
+    - Get Reservation Status:
+        call: http.post
+        args:
+            url: https://us-central1-uri-test.cloudfunctions.net/GetReservationStatus
+            auth:
+                type: OIDC
+            body:
+                project: ${args.project}
+                zone: ${args.zone}
+                body: ${args.body}
+        result: ResultCreate
+    - Check Reservation Status:
+        switch:
+            - condition: ${ResultCreate.body.status=="READY"}
+              next: Publish To PubSub
+        next: Wait 5 Seconds      
+    - Wait 5 Seconds:
+        call: sys.sleep
+        args:
+            seconds: 5
+        next: Waiting 5 seconds Log    
+    - Waiting 5 seconds Log:
+        call: sys.log
+        args:
+            text: Waiting 5 seconds
+            severity: INFO
+        next: Get Reservation Status    
+    - Publish To PubSub:
+        next: PubSub Log
+    - PubSub Log:
+        call: sys.log
+        args:
+            text: Publishing to PubSub
+            severity: INFO  
+        next: "returnValue"      
+    - returnValue:
+        return: "Published to PubSub"

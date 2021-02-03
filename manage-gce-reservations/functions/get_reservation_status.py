@@ -29,8 +29,8 @@ def get_reservation_status(request):
     # zone = request_json['zone']
     zone = 'us-east1-c'
     # reservation_name = request_json['name']
-    reservation_name = 'gce2'
-    reservation_name = request_json['body']['name']
+    reservation_name = 'gce1'
+    # reservation_name = request_json['body']['name']
 
     reservation = gce_service.reservations().get(
         project=project, zone=zone, reservation=reservation_name).execute()
