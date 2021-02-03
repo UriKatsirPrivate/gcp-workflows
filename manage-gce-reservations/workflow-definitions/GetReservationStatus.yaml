@@ -1,7 +1,12 @@
-# Sample input {"body":{"description":"Demo","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}},"name":"gce"},"project":"uri-test","zone":"us-east1-c"}
+# Sample input {"body":{"description":"Demo","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}},"name":"gce"},"project":"uri-test","zone":"us-central1-a"}
 main:
     params: [args]
     steps:
+    - initVariables:
+        assign:
+        - project: ${args.project}
+        - topic: "workflows-demo"
+        # - message: "GetReservationStatus message"
     - Get Reservation Status:
         call: http.post
         args:
@@ -22,20 +27,26 @@ main:
         call: sys.sleep
         args:
             seconds: 5
-        next: Waiting 5 seconds Log    
-    - Waiting 5 seconds Log:
-        call: sys.log
+        next: Publish 5 seconds To PubSub    
+    - Publish 5 seconds To PubSub:
+        call: googleapis.pubsub.v1.projects.topics.publish
         args:
-            text: Waiting 5 seconds
-            severity: INFO
+            topic: ${"projects/" + project + "/topics/" + topic}
+            body:
+                messages:
+                    # - data: ${base64.encode(text.encode(message))}
+                    - data: ${base64.encode(text.encode("Waiting 5 seconds message"))}
+        result: publishResult
         next: Get Reservation Status    
     - Publish To PubSub:
-        next: PubSub Log
-    - PubSub Log:
-        call: sys.log
+        call: googleapis.pubsub.v1.projects.topics.publish
         args:
-            text: Publishing to PubSub
-            severity: INFO  
-        next: "returnValue"      
+            topic: ${"projects/" + project + "/topics/" + topic}
+            body:
+                messages:
+                    # - data: ${base64.encode(text.encode(message))}
+                    - data: ${base64.encode(text.encode("Publish To PubSub message"))}
+        result: publishResult
+        next: returnValue
     - returnValue:
         return: "Published to PubSub"
