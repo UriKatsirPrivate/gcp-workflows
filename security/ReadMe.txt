@@ -1,1 +1,1 @@
-Put your json key that you generated when configuring OAuth in this folder.
+This folder should contain the Service Account key that is used for running the functions locally.
