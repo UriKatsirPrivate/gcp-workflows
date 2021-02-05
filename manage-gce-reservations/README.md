@@ -17,3 +17,8 @@ Manages GCE compute reservations
 2. Deploy all workflows in the 'workflow-definitions' folder. Use the service account created in the Prerequisites section. 
 3. Create a PubSub topic and subscription.
 4. Run the workflows manually or [using Cloud Scheduler](https://cloud.google.com/workflows/docs/schedule-workflow). Use the workflow-input.json as a sample input. (Modify the workflow-input.json file to fit your use case.)
+
+### Supporting References
+1. [GCE Reservations REST API](https://cloud.google.com/compute/docs/reference/rest/v1/reservations).
+2. [Cron expressions generator](https://www.freeformatter.com/cron-expression-generator-quartz.html) and [Here](https://crontab.cronhub.io/) and [Here](http://www.cronmaker.com/;jsessionid=node01jr1tu19xhphf1oxtzv8emirge173782.node0?0).
+3. [Scheduling a workflow using Cloud Scheduler](https://cloud.google.com/workflows/docs/schedule-workflow).
