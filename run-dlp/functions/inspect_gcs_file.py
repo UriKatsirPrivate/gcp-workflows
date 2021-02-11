@@ -19,7 +19,6 @@ credentials = service_account.Credentials.from_service_account_file(
 
 # # Local testing
 dlp = build('dlp', 'v2', credentials=credentials)
-# topic = build('pubsub', 'v1', credentials=credentials)
 # # -------------------------------------------------------------
 
 # # Run on GCP
@@ -31,8 +30,6 @@ def inspect_gcs_file(
     project,
     bucket,
     filename,
-    topic_id,
-    subscription_id,
     info_types,
     custom_dictionaries=None,
     custom_regexes=None,
@@ -46,11 +43,6 @@ def inspect_gcs_file(
         bucket: The name of the GCS bucket containing the file, as a string.
         filename: The name of the file in the bucket, including the path, as a
             string; e.g. 'images/myfile.png'.
-        topic_id: The id of the Cloud Pub/Sub topic to which the API will
-            broadcast job completion. The topic must already exist.
-        subscription_id: The id of the Cloud Pub/Sub subscription to listen on
-            while waiting for job completion. The subscription must already
-            exist and be subscribed to the topic.
         info_types: A list of strings representing info types to look for.
             A full list of info type categories can be fetched from the API.
         min_likelihood: A string representing the minimum likelihood threshold
@@ -62,18 +54,9 @@ def inspect_gcs_file(
         None; the response from the API is printed to the terminal.
     """
 
-    # import google.cloud.dlp
-
-    # import google.cloud.pubsub
-
-    # Instantiate a client.
-    # dlp = google.cloud.dlp_v2.DlpServiceClient()
-
-    # Prepare info_types by converting the list of strings into a list of
-    # dictionaries (protos are also accepted).
     if not info_types:
         info_types = ["FIRST_NAME", "LAST_NAME", "EMAIL_ADDRESS"]
-    info_types = [{"name": info_type} for info_type in info_types]
+    # info_types = [{"name": info_type} for info_type in info_types]
 
     # Prepare custom_info_types by parsing the dictionary word lists and
     # regex patterns.
@@ -111,40 +94,32 @@ def inspect_gcs_file(
     storage_config = {"cloud_storage_options": {"file_set": {"url": url}}}
 
     # Convert the project id into full resource ids.
-    # topic = google.cloud.pubsub.PublisherClient.topic_path(project, topic_id)
     parent = f"projects/{project}"
-
-    # Tell the API where to send a notification when the job is complete.
-    # actions = [{"pub_sub": {"topic": topic}}]
 
     # Construct the inspect_job, which defines the entire inspect content task.
     inspect_job = {
         "inspectConfig": inspect_config,
-        "storageConfig": storage_config,
+        "storageConfig": storage_config
         # "actions": actions,
     }
 
-    body = {"inspectJob":{"inspectConfig":{"infoTypes":[{"name":"PHONE_NUMBER"}],"minLikelihood":"LIKELIHOOD_UNSPECIFIED"},"storageConfig":{"cloudStorageOptions":{"fileSet":{"url":"gs://uri-test-dlp/keep.txt"}}}}}
+    body =  {"inspectJob":inspect_job}
+    # body =  {"inspectJob":{"inspectConfig":{"infoTypes":[{"name":"PHONE_NUMBER"}],"minLikelihood":"LIKELIHOOD_UNSPECIFIED"},"storageConfig":{"cloudStorageOptions":{"fileSet":{"url":"gs://uri-test-dlp/keep.txt"}}}}}
 
     operation = dlp.projects().dlpJobs().create(
         parent= parent, body=body).execute()
     
-    # operation = dlp.create_dlp_job(
-    #     request={"parent": parent, "inspect_job": inspect_job}
-    # )
+  
     print("Inspection operation started: {}".format(operation.get("name")))
 
-    # Create a Pub/Sub client and find the subscription. The subscription is
-    # expected to already be listening to the topic.
-    # subscriber = google.cloud.pubsub.SubscriberClient()
-    # subscription_path = subscriber.subscription_path(project, subscription_id)
+    
 
 
 info_types = [{"name": info_type} for info_type in
-              ["CREDIT_CARD_NUMBER", "AUSTRALIA_TAX_FILE_NUMBER", "EMAIL_ADDRESS", "ETHNIC_GROUP", "FIRST_NAME", "LAST_NAME", "GCP_CREDENTIALS", "PHONE_NUMBER"]]
+              ["PERSON_NAME","ORGANIZATION_NAME","LAST_NAME","URL","CREDIT_CARD_NUMBER", "DOMAIN_NAME", "EMAIL_ADDRESS", "ETHNIC_GROUP", "FIRST_NAME", "LAST_NAME", "GCP_CREDENTIALS", "PHONE_NUMBER"]]
+
+
 # info_types = [{"name": info_type} for info_type in
 #               ["PHONE_NUMBER"]]
-inspect_gcs_file("uri-test", "uri-test-dlp", "keep.txt",
-                 "workflows-demo", "workflows-demo-sub", info_types)
 
-ddd =''
+inspect_gcs_file("uri-test", "uri-test-dlp", "keep.txt",info_types,None,None,"LIKELIHOOD_UNSPECIFIED",None,300)

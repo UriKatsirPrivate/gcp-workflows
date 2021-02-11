@@ -40,5 +40,5 @@ def get_dlp_job_status(JobName):
     print("Inspection operation started: {}".format(operation.get("state")))
 
     
-jobName = "projects/uri-test/dlpJobs/i-demo"
+jobName = "projects/uri-test/dlpJobs/i-4963342747930231345"
 get_dlp_job_status(jobName)
