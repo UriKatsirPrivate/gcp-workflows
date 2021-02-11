@@ -31,8 +31,6 @@ def inspect_gcs_file(
     bucket,
     filename,
     info_types,
-    custom_dictionaries=None,
-    custom_regexes=None,
     min_likelihood=None,
     max_findings=None,
     timeout=300,
@@ -56,35 +54,10 @@ def inspect_gcs_file(
 
     if not info_types:
         info_types = ["FIRST_NAME", "LAST_NAME", "EMAIL_ADDRESS"]
-    # info_types = [{"name": info_type} for info_type in info_types]
-
-    # Prepare custom_info_types by parsing the dictionary word lists and
-    # regex patterns.
-    if custom_dictionaries is None:
-        custom_dictionaries = []
-    dictionaries = [
-        {
-            "info_type": {"name": "CUSTOM_DICTIONARY_{}".format(i)},
-            "dictionary": {"word_list": {"words": custom_dict.split(",")}},
-        }
-        for i, custom_dict in enumerate(custom_dictionaries)
-    ]
-    if custom_regexes is None:
-        custom_regexes = []
-    regexes = [
-        {
-            "info_type": {"name": "CUSTOM_REGEX_{}".format(i)},
-            "regex": {"pattern": custom_regex},
-        }
-        for i, custom_regex in enumerate(custom_regexes)
-    ]
-    custom_info_types = dictionaries + regexes
-
-    # Construct the configuration dictionary. Keys which are None may
-    # optionally be omitted entirely.
+    
+    
     inspect_config = {
         "info_types": info_types,
-        "custom_info_types": custom_info_types,
         "min_likelihood": min_likelihood,
         "limits": {"max_findings_per_request": max_findings},
     }
@@ -112,14 +85,10 @@ def inspect_gcs_file(
   
     print("Inspection operation started: {}".format(operation.get("name")))
 
-    
-
-
 info_types = [{"name": info_type} for info_type in
               ["PERSON_NAME","ORGANIZATION_NAME","LAST_NAME","URL","CREDIT_CARD_NUMBER", "DOMAIN_NAME", "EMAIL_ADDRESS", "ETHNIC_GROUP", "FIRST_NAME", "LAST_NAME", "GCP_CREDENTIALS", "PHONE_NUMBER"]]
-
 
 # info_types = [{"name": info_type} for info_type in
 #               ["PHONE_NUMBER"]]
 
-inspect_gcs_file("uri-test", "uri-test-dlp", "keep.txt",info_types,None,None,"LIKELIHOOD_UNSPECIFIED",None,300)
+inspect_gcs_file("uri-test", "uri-test-dlp", "keep.txt",info_types,"LIKELIHOOD_UNSPECIFIED",None,300)
