@@ -26,15 +26,8 @@ dlp = build('dlp', 'v2', credentials=credentials)
 # # -------------------------------------------------------------
 
 
-def inspect_gcs_file(
-    project,
-    bucket,
-    filename,
-    info_types,
-    min_likelihood=None,
-    max_findings=None,
-    timeout=300,
-):
+# def inspect_gcs_file(project,bucket,filename,info_types,min_likelihood=None,max_findings=None,timeout=300):
+def inspect_gcs_file(request):
     """Uses the Data Loss Prevention API to analyze a file on GCS.
     Args:
         project: The Google Cloud project id to use as a parent resource.
@@ -51,11 +44,21 @@ def inspect_gcs_file(
     Returns:
         None; the response from the API is printed to the terminal.
     """
+    # request_json = request.get_json()
+    request_json = request
+    project = request_json['project']
+    bucket = request_json['bucket']
+    filename = request_json['filename']
+    info_types = request_json['inspectJob']['inspectConfig']['infoTypes']
+    min_likelihood = request_json['inspectJob']['inspectConfig']['minLikelihood']
+    max_findings = None
+    max_findings = None
+
+
 
     if not info_types:
         info_types = ["FIRST_NAME", "LAST_NAME", "EMAIL_ADDRESS"]
-    
-    
+
     inspect_config = {
         "info_types": info_types,
         "min_likelihood": min_likelihood,
@@ -76,19 +79,25 @@ def inspect_gcs_file(
         # "actions": actions,
     }
 
-    body =  {"inspectJob":inspect_job}
+    body = {"inspectJob": inspect_job}
     # body =  {"inspectJob":{"inspectConfig":{"infoTypes":[{"name":"PHONE_NUMBER"}],"minLikelihood":"LIKELIHOOD_UNSPECIFIED"},"storageConfig":{"cloudStorageOptions":{"fileSet":{"url":"gs://uri-test-dlp/keep.txt"}}}}}
 
     operation = dlp.projects().dlpJobs().create(
-        parent= parent, body=body).execute()
-    
-  
+        parent=parent, body=body).execute()
+
     print("Inspection operation started: {}".format(operation.get("name")))
 
-info_types = [{"name": info_type} for info_type in
-              ["PERSON_NAME","ORGANIZATION_NAME","LAST_NAME","URL","CREDIT_CARD_NUMBER", "DOMAIN_NAME", "EMAIL_ADDRESS", "ETHNIC_GROUP", "FIRST_NAME", "LAST_NAME", "GCP_CREDENTIALS", "PHONE_NUMBER"]]
+    return operation
+
+
+# info_types = [{"name": info_type} for info_type in
+#               ["PERSON_NAME", "ORGANIZATION_NAME", "LAST_NAME", "URL", "CREDIT_CARD_NUMBER", "DOMAIN_NAME", "EMAIL_ADDRESS", "ETHNIC_GROUP", "FIRST_NAME", "LAST_NAME", "GCP_CREDENTIALS", "PHONE_NUMBER"]]
 
 # info_types = [{"name": info_type} for info_type in
 #               ["PHONE_NUMBER"]]
 
-inspect_gcs_file("uri-test", "uri-test-dlp", "keep.txt",info_types,"LIKELIHOOD_UNSPECIFIED",None,300)
+# inspect_gcs_file("uri-test", "uri-test-dlp", "keep.txt",
+#                  info_types, "LIKELIHOOD_UNSPECIFIED", None, 300)
+
+request = '{"project":"uri-test","bucket":"uri-test-dlp","filename":"keep.txt","inspectJob":{"inspectConfig":{"infoTypes":[{"name":"PERSON_NAME"},{"name":"ORGANIZATION_NAME"},{"name":"LAST_NAME"},{"name":"URL"},{"name":"CREDIT_CARD_NUMBER"},{"name":"DOMAIN_NAME"},{"name":"EMAIL_ADDRESS"},{"name":"ETHNIC_GROUP"},{"name":"FIRST_NAME"},{"name":"LAST_NAME"},{"name":"GCP_CREDENTIALS"},{"name":"PHONE_NUMBER"}],"minLikelihood":"LIKELIHOOD_UNSPECIFIED"},"storageConfig":{"cloudStorageOptions":{"fileSet":{"url":"gs://uri-test-dlp/keep.txt"}}}}}'
+inspect_gcs_file(json.loads(request))
