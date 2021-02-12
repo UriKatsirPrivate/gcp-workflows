@@ -1,4 +1,3 @@
-# Sample input {"project":"uri-test","pubSubTopic":"workflows-demo","zone":"us-central1-a","timeInterval":"10","body":{"description":"Demo","name":"gce","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}}}}
 main:
     params: [args]
     steps:
@@ -6,7 +5,7 @@ main:
         assign:
         - project: 'uri-test'
         - topic: 'workflows-demo'
-        - timeInterval: '5'
+        - timeInterval: '10'
     - Create DLP Job:
         call: http.post
         args:
@@ -30,23 +29,28 @@ main:
     - Check Job Status:
         switch:
             - condition: ${ResultStatus.body.state=="DONE"}
-              next: Publish To PubSub
+              next: Found DLP Results?
         next: Wait for Job Result      
     - Wait for Job Result:
         call: sys.sleep
         args:
             seconds: ${int(timeInterval)}
-        next: Publish 5 seconds To PubSub    
-    - Publish 5 seconds To PubSub:
+        next: Publish wait message To PubSub
+    - Publish wait message To PubSub:
         call: googleapis.pubsub.v1.projects.topics.publish
         args:
             topic: ${"projects/" + project + "/topics/" + topic}
             body:
                 messages:
                     # - data: ${base64.encode(text.encode(message))}
-                    - data: ${base64.encode(text.encode("Waiting" + timeInterval + " seconds message"))}
+                    - data: ${base64.encode(text.encode("Waiting " + timeInterval + " seconds message"))}
         result: publishResult
         next: Get DLP Job Status    
+    - Found DLP Results?:
+        switch:
+            - condition: ${len(ResultStatus.body.inspectDetails.result.infoTypeStats)>0}
+              next: Publish To PubSub
+        next: returnValue
     - Publish To PubSub:
         call: googleapis.pubsub.v1.projects.topics.publish
         args:
@@ -54,7 +58,7 @@ main:
             body:
                 messages:
                     # - data: ${base64.encode(text.encode(message))}
-                    - data: ${base64.encode(text.encode("Publish To PubSub message"))}
+                    - data: ${base64.encode(text.encode("DLP job " + ResultStatus.body.name + " completed and found DLP issues."))}
         result: publishResult
         next: returnValue
     - returnValue:
