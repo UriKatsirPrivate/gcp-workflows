@@ -3,7 +3,11 @@ Responds to GCS file upload and runs a DLP job on the uploaded file. Reports to 
 
 ## Main Steps
 1. See detailed flow in the [image](https://github.com/UriKatsirPrivate/gcp-workflows/blob/main/run-dlp/Images/flow.png)
-2. 
+2. The workflow is triggered once a new object is uploaded to a GCS bucket.
+3. The workflow creates and runs a DLP job to inspect the uploaded object.
+4. The workflow periodically checks the status of the DLP job until the job is complete.
+5. Once the DLP job completes, The workflow inspects the job results.
+6. In the DLP job found any DLP issues, the workflow will post a message to PubSub with the Job ID.
 
 ## Prerequisites
 1. GCP project.
