@@ -49,8 +49,8 @@ def inspect_gcs_file(request):
     project = request_json['project']
     bucket = request_json['bucket']
     filename = request_json['filename']
-    info_types = request_json['inspectJob']['inspectConfig']['infoTypes']
-    min_likelihood = request_json['inspectJob']['inspectConfig']['minLikelihood']
+    info_types = [{"name":"PERSON_NAME"},{"name":"ORGANIZATION_NAME"},{"name":"LAST_NAME"},{"name":"URL"},{"name":"CREDIT_CARD_NUMBER"},{"name":"DOMAIN_NAME"},{"name":"EMAIL_ADDRESS"},{"name":"ETHNIC_GROUP"},{"name":"FIRST_NAME"},{"name":"LAST_NAME"},{"name":"GCP_CREDENTIALS"},{"name":"PHONE_NUMBER"}]
+    min_likelihood = 'LIKELIHOOD_UNSPECIFIED'
     max_findings = None
     max_findings = None
 
