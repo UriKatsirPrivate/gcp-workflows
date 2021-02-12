@@ -4,9 +4,9 @@ main:
     steps:
     - initVariables:
         assign:
-        - project: ${args.project}
+        - project: 'uri-test'
         - topic: 'workflows-demo'
-        - timeInterval: 10
+        - timeInterval: '5'
     - Create DLP Job:
         call: http.post
         args:
@@ -18,15 +18,24 @@ main:
                 bucket: ${args.bucket}
                 filename: ${args.name}
         result: ResultCreate
-    - Check Reservation Status:
+    - Get DLP Job Status:
+        call: http.post
+        args:
+            url: https://us-central1-uri-test.cloudfunctions.net/DlpInspectJobStatus
+            auth:
+                type: OIDC
+            body:
+                name: ${ResultCreate.body.name}
+        result: ResultStatus    
+    - Check Job Status:
         switch:
-            - condition: ${ResultCreate.body.status=="READY"}
+            - condition: ${ResultStatus.body.state=="DONE"}
               next: Publish To PubSub
-        next: Wait for Reservation Result      
-    - Wait for Reservation Result:
+        next: Wait for Job Result      
+    - Wait for Job Result:
         call: sys.sleep
         args:
-            seconds: ${int(args.timeInterval)}
+            seconds: ${int(timeInterval)}
         next: Publish 5 seconds To PubSub    
     - Publish 5 seconds To PubSub:
         call: googleapis.pubsub.v1.projects.topics.publish
@@ -37,7 +46,7 @@ main:
                     # - data: ${base64.encode(text.encode(message))}
                     - data: ${base64.encode(text.encode("Waiting" + timeInterval + " seconds message"))}
         result: publishResult
-        next: Get Reservation Status    
+        next: Get DLP Job Status    
     - Publish To PubSub:
         call: googleapis.pubsub.v1.projects.topics.publish
         args:
@@ -49,4 +58,4 @@ main:
         result: publishResult
         next: returnValue
     - returnValue:
-        return: "Published to PubSub"
+        return: ${ResultStatus.body.state}
