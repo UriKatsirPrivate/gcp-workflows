@@ -127,3 +127,4 @@ dmypy.json
 .vscode/settings.json
 security/uri-test-38aacab75c2a.json
 manage-gce-reservations/LocalTestingFunctions/*
+list-instances/*
