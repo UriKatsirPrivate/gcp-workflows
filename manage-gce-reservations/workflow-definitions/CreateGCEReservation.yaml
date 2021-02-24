@@ -1,7 +1,12 @@
-# Sample input {"body":{"description":"Demo","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}},"name":"gce"},"project":"uri-test","zone":"us-east1-c"}
+# Sample input {"body":{"description":"Demo","name":"gce","specificReservation":{"count":1,"instanceProperties":{"machineType":"n1-standard-2"}}},"project":"uri-test","pubSubTopic":"workflows-demo","timeInterval":"10","zone":"us-central1-a"}
 main:
     params: [args]
     steps:
+    - initVariables:
+        assign:
+        - project: ${args.project}
+        - topic: ${args.pubSubTopic}
+        - timeInterval: ${args.timeInterval}
     - Create Reservation:
         call: http.post
         args:
@@ -9,25 +14,50 @@ main:
             auth:
                 type: OIDC
             body:
-                project: ${args.project}
+                project: ${project}
                 zone: ${args.zone}
                 body: ${args.body}
-        result: ResultCreate
-    # - Create Machine Image:
-    #     try:
-    #         call: http.post
-    #         args:
-    #             url: https://us-central1-uri-test.cloudfunctions.net/CreateMachineImages
-    #             auth:
-    #                 type: OIDC
-    #             body:
-    #                 project: ${args.project}
-    #                 items: ${ResultList.body.items}
-    #         result: ResultImages
-    #     except:
-    #         as: e
-    #         steps:
-    #             - All Errors:
-    #                 next: returnValue   
+        # result: ResultCreate
+    - Get Reservation Status:
+        call: http.post
+        args:
+            url: https://us-central1-uri-test.cloudfunctions.net/GetReservationStatus
+            auth:
+                type: OIDC
+            body:
+                project: ${project}
+                zone: ${args.zone}
+                body: ${args.body}
+        result: ResultStatus
+    - Check Reservation Status:
+        switch:
+            - condition: ${ResultStatus.body.status=="READY"}
+              next: Publish To PubSub
+        next: Wait for Reservation Result      
+    - Wait for Reservation Result:
+        call: sys.sleep
+        args:
+            seconds: ${int(timeInterval)}
+        next: Publish 5 seconds To PubSub    
+    - Publish 5 seconds To PubSub:
+        call: googleapis.pubsub.v1.projects.topics.publish
+        args:
+            topic: ${"projects/" + project + "/topics/" + topic}
+            body:
+                messages:
+                    # - data: ${base64.encode(text.encode(message))}
+                    - data: ${base64.encode(text.encode("Waiting" + timeInterval + " seconds message"))}
+        # result: publish5SecondsResult
+        next: Get Reservation Status    
+    - Publish To PubSub:
+        call: googleapis.pubsub.v1.projects.topics.publish
+        args:
+            topic: ${"projects/" + project + "/topics/" + topic}
+            body:
+                messages:
+                    # - data: ${base64.encode(text.encode(args))}
+                    - data: ${base64.encode(text.encode("Publish To PubSub message"))}
+        # result: publishResult
+        next: returnValue
     - returnValue:
-        return: ${ResultCreate}
+        return: "Published to PubSub"
