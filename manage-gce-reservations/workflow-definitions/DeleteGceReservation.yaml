@@ -13,21 +13,5 @@ main:
                 zone: ${args.zone}
                 body: ${args.body}
         result: ResultDelete
-    # - Create Machine Image:
-    #     try:
-    #         call: http.post
-    #         args:
-    #             url: https://us-central1-uri-test.cloudfunctions.net/CreateMachineImages
-    #             auth:
-    #                 type: OIDC
-    #             body:
-    #                 project: ${args.project}
-    #                 items: ${ResultList.body.items}
-    #         result: ResultImages
-    #     except:
-    #         as: e
-    #         steps:
-    #             - All Errors:
-    #                 next: returnValue   
     - returnValue:
         return: ${ResultDelete}
