@@ -11,10 +11,16 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
+# copy the requirements file used for dependencies
+COPY requirements.txt .
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
 # Install production dependencies.
 RUN pip install Flask gunicorn
-RUN pip install google-api-python-client
-RUN pip install google-oauth
+# RUN pip install google-api-python-client
+# RUN pip install google-oauth
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.

@@ -1,0 +1,2 @@
+google-oauth
+google-api-python-client
