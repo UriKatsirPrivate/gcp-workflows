@@ -16,8 +16,6 @@ workflow_service = build('workflowexecutions', 'v1')
 
 @app.route("/")
 def hello_world():
-    # name = os.environ.get("NAME", "World")
-    # return "CloudRun Serverless myths"
     parent = "projects/uri-test/locations/us-central1/workflows/CreateMachineImagesInAllZones"
     body = {"argument": '{"project": "uri-test","zone": "us-east1-b"}'}
 
