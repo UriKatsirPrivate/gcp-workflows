@@ -4,7 +4,7 @@ Manages GCE compute reservations
 ## Main Steps
 1. Creates a GCE reservation based on the specification in the input file. see [Sample input file](https://github.com/UriKatsirPrivate/gcp-workflows/blob/main/manage-gce-reservations/supporting-documents/workflow-input.json)
 2. The create reservations is an async request so the workflow polls for the status.
-3. Once the reservation becomes available, THe workflow publishes a message to PubSub.
+3. Once the reservation becomes available, The workflow publishes a message to PubSub.
 3. The published message will kick off a compute process that uses the reservation. (Not included in this solution)
 4. Once the compute process is done, Publish another message to PubSub, indicating it is OK to delete the reservation.(Not included in this solution)
 5. The published message (from step #5 above) will kick off a [workflow that will delete the reservation](https://github.com/UriKatsirPrivate/gcp-workflows/blob/main/manage-gce-reservations/workflow-definitions/DeleteGceReservation.yaml).
