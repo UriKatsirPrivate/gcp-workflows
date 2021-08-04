@@ -1,0 +1,7 @@
+{
+    "workflow_name": "CreateMachineImagesInAllZones",
+    "view_type": "BASIC",
+    "workflow_region": "us-central1",
+    "base_url": "https://workflowexecutions.googleapis.com/v1/projects/",
+    "search_term": "SUCCEEDED"
+}

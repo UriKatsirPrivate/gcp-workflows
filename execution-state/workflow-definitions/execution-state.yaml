@@ -1,0 +1,40 @@
+# This workflow 
+# Sample Input: {"workflow_name":"CreateMachineImagesInAllZones","view_type":"BASIC","workflow_region":"us-central1","base_url":"https://workflowexecutions.googleapis.com/v1/projects/","search_term":"SUCCEEDED"}
+main:
+    params: [input]
+    steps:
+    - Init Variables:
+        assign:
+        - project: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
+        - searchTerm: "Assign Me"
+        - region: ${input.workflow_region}
+        # BASIC or FULL
+        - view: ${input.view_type} 
+        - workflow_name: ${input.workflow_name}
+        - base_url: ${input.base_url}
+        # The workflow state to look for as described here: https://cloud.google.com/workflows/docs/reference/executions/rest/v1/projects.locations.workflows.executions#State
+        - search_term: ${input.search_term}
+    - Get Execution Details:
+        call: http.get
+        args:
+            url: ${base_url + project +"/locations/" + region +"/workflows/" + workflow_name +"/executions?view=" + view}
+            # url: https://workflowexecutions.googleapis.com/v1/projects/uri-test/locations/us-central1/workflows/CreateMachineImagesInAllZones/executions?view=BASIC
+            auth:
+                type: OAuth2
+        result: ExecutionDetails
+    - Check Execution State:
+        switch:
+        # - condition: ${len(text.find_all(json.encode_to_string(ExecutionDetails),"SUCCEEDED"))>0}
+            - condition: ${len(text.find_all(json.encode_to_string(ExecutionDetails),search_term))>0}
+              next: Search Term Found
+        next: Search Term Not Found
+    - Search Term Not Found:
+        assign:
+            -  searchTerm: "No"
+        next: returnOutput    
+    - Search Term Found:
+        assign:
+            -  searchTerm: "Yes"        
+    - returnOutput:
+        #    return: ${ExecutionDetails}
+            return: ${searchTerm}
