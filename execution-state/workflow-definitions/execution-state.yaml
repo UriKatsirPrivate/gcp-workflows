@@ -30,11 +30,11 @@ main:
         next: Search Term Not Found
     - Search Term Not Found:
         assign:
-            -  searchTerm: "No"
+            -  searchTerm: "State not found"
         next: returnOutput    
     - Search Term Found:
         assign:
-            -  searchTerm: "Yes"        
+            -  searchTerm: "Found state"        
     - returnOutput:
         #    return: ${ExecutionDetails}
             return: ${searchTerm}
