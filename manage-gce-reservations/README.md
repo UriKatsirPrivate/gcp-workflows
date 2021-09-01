@@ -23,3 +23,4 @@ Manages GCE compute reservations
 1. [GCE Reservations REST API](https://cloud.google.com/compute/docs/reference/rest/v1/reservations).
 2. [Cron expressions generator](https://www.freeformatter.com/cron-expression-generator-quartz.html) and [Here](https://crontab.cronhub.io/) and [Here](http://www.cronmaker.com/;jsessionid=node01jr1tu19xhphf1oxtzv8emirge173782.node0?0).
 3. [Scheduling a workflow using Cloud Scheduler](https://cloud.google.com/workflows/docs/schedule-workflow).
+4. [Setting email notifications using PubSub and SendGrid](https://cloud.google.com/security-command-center/docs/how-to-enable-real-time-notifications#setting_up_a_messaging_app)

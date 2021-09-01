@@ -135,3 +135,4 @@ terraform/.terraform/terraform.tfstate
 terraform/.terraform/providers/registry.terraform.io/hashicorp/google/3.65.0/darwin_amd64/terraform-provider-google_v3.65.0_x5
 terraform/.terraform/terraform.tfstate
 terraform/.terraform/terraform.tfstate
+manage-gce-reservations/supporting-documents/SendGridKey.txt
