@@ -18,5 +18,5 @@
     "project": "uri-test",
     "pubSubTopic": "workflows-demo",
     "timeInterval": "10",
-    "zone": "us-central1-a"
+    "zone": "europe-west4-a"
 }
